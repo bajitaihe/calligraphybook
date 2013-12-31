@@ -1,8 +1,8 @@
 menu:
-  主页: /
-  新闻动态: /news
-  关于我们: /about
-  联系方式: /contact
+  主頁: /
+  新聞動態: /news
+  關於我們: /about
+  聯繫方式: /contact
 
 widgets:
 - search
