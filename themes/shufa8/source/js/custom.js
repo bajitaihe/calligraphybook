@@ -6,13 +6,10 @@
 		$(".download").click(function(){
 			var eleId = $(this).attr("id");
 			var eleUrl = $(this).attr("url");
-			
-			alert(eleId);
 
 			var deferred = $.Deferred();
 
 			var initStats = function(){
-				alert("initStats");
 				if(downloads == null){
 					downloads = {};
 
@@ -32,7 +29,6 @@
 			};
 
 			var updateStats = function(){
-				alert("updateStats");
 				if(downloads[eleId] == null){
 					downloads[eleId] = 0;
 				}
@@ -49,7 +45,6 @@
 			};
 
 			var downlodFile = function(){
-				alert("downlodFile");
 				$.fileDownload(eleUrl);
 			};
 
