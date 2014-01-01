@@ -1,75 +1,63 @@
-(function($, window){
-	var downloads = null;
-	var downloadsRef = new Firebase("https://calligraphybook.firebaseio.com/downloads");
+(function($, window) {
+	// initialize
+	(function() {
+		var downloadsRef = new Firebase("https://calligraphybook.firebaseio.com/downloads");
+		downloadsRef.on("value", function(snapshot) {
+			var currVal = snapshot.val();
+			if (currVal == null) {
+				currVal = {};
+			} else {
+				currVal = snapshot.val();
+			}
 
-	(function(){
-		$(".download").click(function(){
+			(function() {
+				$(".download").each(function() {
+					var id = $(this).attr("id");
+					if (id in currVal) {
+						var count = currVal[id];
+						$(this).attr("title", "下載次數：" + count);
+					}
+				});
+			})();
+		});
+	})();
+
+	// listen to download
+	(function() {
+		$(".download").click(function() {
 			var eleId = $(this).attr("id");
 			var eleUrl = $(this).attr("url");
 
 			var deferred = $.Deferred();
 
-			var initStats = function(){
-				if(downloads == null){
-					downloads = {};
-
-					downloadsRef.once("value",function(snapshot){
-						var currVal = snapshot.val() ? snapshot.val() : {};
-						for(var id in currVal){
-							downloads[id] = parseInt(currVal[id]);
-						}
-
+			var downloadRef = new Firebase("https://calligraphybook.firebaseio.com/downloads/" + eleId);
+			var currCount;
+			var initStats = function() {
+					downloadRef.once("value", function(snapshot) {
+						currCount = snapshot.val() ? parseInt(snapshot.val()) : 0;
 						deferred.resolve();
 					});
-				} else {
-					deferred.resolve();
-				}
 
-				return deferred;		
-			};
+					return deferred;
+				};
 
-			var updateStats = function(){
-				if(downloads[eleId] == null){
-					downloads[eleId] = 0;
-				}
-				downloads[eleId]++;
-				downloadsRef.child(eleId).set(downloads[eleId],function(error){
-					if(error){
-						deferred.reject();
-					} else {
-						deferred.resolve();
-					}
-				});
+			var updateStats = function() {
+					downloadRef.set(currCount + 1, function(error) {
+						if (error) {
+							deferred.reject();
+						} else {
+							deferred.resolve();
+						}
+					});
 
-				return deferred.promise();
-			};
+					return deferred.promise();
+				};
 
-			var downlodFile = function(){
-				$.fileDownload(eleUrl);
-			};
+			var downlodFile = function() {
+					$.fileDownload(eleUrl);
+				};
 
 			initStats().done(updateStats).always(downlodFile);
-		});
-	})();
-
-	(function(){		
-		downloadsRef.on("value", function(snapshot){
-			var currVal = snapshot.val();
-			if( currVal == null){
-				currVal = {};
-			} else {
-				currVal = snapshot.val();
-			}
-			
-			(function(){
-				$(".download").each(function(){
-					var id = $(this).attr("id");
-					if(id in currVal){
-						var count = currVal[id];
-						$(this).attr("title","下載次數：" + count);
-					}
-				});
-			})();
 		});
 	})();
 })(jQuery, window);
